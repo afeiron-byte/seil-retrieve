@@ -8,7 +8,7 @@
   <!-- ============================================================== -->
   <!-- [구글 웹앱 URL] -->
   <script>
-    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwS-542EUFTIDOg1zf9wFYfFuTlv2ZCer-rw3H14-ZptDBXGAui5aF3gF1iX6K7-ley/exec";
+    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzkFrusU7jFbX0_3qJeSNmz7t89TPqvibmzYRlXgBHPFstjonsx68EKQfdfGUdHjW9e/exec";
   </script>
   <!-- ============================================================== -->
 
@@ -46,11 +46,11 @@
     .modal-box { background: white; border-radius: 16px; max-width: 440px; width: 100%; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
 
     /* ============================================================== */
-    /* [A4 인쇄 전용 CSS] 상하좌우 20mm 여백, 좌측 상단 정렬, 비고란 여백 확장 */
+    /* [A4 인쇄 전용 CSS 수정 - .hidden 클래스를 강제로 제거하여 프린트 출력] */
     /* ============================================================== */
     @page {
       size: A4 portrait;
-      margin: 20mm;
+      margin: 15mm;
     }
 
     @media print {
@@ -59,18 +59,24 @@
         margin: 0 !important;
         padding: 0 !important;
       }
-      body * { visibility: hidden; }
-      #printArea, #printArea * { visibility: visible; }
-      #printArea {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
+      .no-print { display: none !important; }
+
+      #printArea, #printArea.hidden {
+        display: block !important;
+        visibility: visible !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
         text-align: left !important;
       }
-      .no-print { display: none !important; }
+
+      #printArea * {
+        visibility: visible !important;
+      }
+
       table {
         border-collapse: collapse !important;
         width: 100% !important;
@@ -297,7 +303,6 @@
             <td id="sum-cable">0</td>
             <td id="sum-adapter">0</td>
             <td id="sum-pouch">0</td>
-            <!-- 모든 부속품 총합 수량 표시 -->
             <td id="sum-grand-total" class="sum-total-box">총 0개 제출</td>
           </tr>
         </tfoot>
@@ -395,26 +400,23 @@
         const saveBtn = document.getElementById('saveBtn');
 
         if (currentStudentItems.verified) {
-          // 교사 확인 완료 시 UI 잠금 처리
           document.getElementById('verifiedNotice').classList.remove('hidden');
           saveBtn.disabled = true;
           saveBtn.innerText = '교사 확인 완료 (수정 불가)';
           saveBtn.classList.remove('btn-green');
-          saveBtn.style.backgroundColor = '#94a3b8'; // 회색으로 변경
+          saveBtn.style.backgroundColor = '#94a3b8';
           saveBtn.style.cursor = 'not-allowed';
         } else {
-          // 미확인 시 정상 활성화
           document.getElementById('verifiedNotice').classList.add('hidden');
           saveBtn.disabled = false;
           saveBtn.innerText = '제출 완료';
           saveBtn.classList.add('btn-green');
-          saveBtn.style.backgroundColor = ''; // 원래 색상 복구
+          saveBtn.style.backgroundColor = '';
           saveBtn.style.cursor = 'pointer';
         }
       }
 
       function toggleItem(key) {
-        // 교사 확인 완료 시 항목 터치(수정) 차단
         if (currentStudentItems.verified) {
           alert('이미 담임 선생님의 확인이 완료되어 수정할 수 없습니다.');
           return;
@@ -437,7 +439,7 @@
 
       function saveStudentSubmission() {
         const payload = {
-          role: 'student', // 백엔드 권한 확인용 (학생)
+          role: 'student',
           id: currentUser.id,
           name: currentUser.name,
           laptop: currentStudentItems.laptop,
@@ -555,7 +557,7 @@
 
       function confirmTeacherVerification() {
         const payload = {
-          role: 'teacher', // 백엔드 권한 확인용 (교사)
+          role: 'teacher',
           id: currentModalStudent.id,
           name: currentModalStudent.name,
           laptop: modalItems.laptop,
@@ -563,7 +565,7 @@
           cable: modalItems.cable,
           adapter: modalItems.adapter,
           pouch: modalItems.pouch,
-          verified: true, // 교사는 확인 완료 처리
+          verified: true,
           note: document.getElementById('modalNoteInput').value.trim()
         };
 
@@ -630,10 +632,17 @@
         document.getElementById('sum-grand-total').innerText = `총 ${grandTotal}개 제출`;
       }
 
+      // 인쇄 실행 함수 (DOM 렌더링 동기화 적용)
       function printA4() {
-        document.getElementById('printArea').classList.remove('hidden');
-        window.print();
-        document.getElementById('printArea').classList.add('hidden');
+        const printArea = document.getElementById('printArea');
+        printArea.classList.remove('hidden');
+        
+        setTimeout(() => {
+          window.print();
+          setTimeout(() => {
+            printArea.classList.add('hidden');
+          }, 500);
+        }, 100);
       }
 
       function logout() {
