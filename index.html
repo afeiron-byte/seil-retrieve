@@ -6,9 +6,9 @@
   <title>2026학년도 노트북 및 부속품 수거 시스템</title>
 
   <!-- ============================================================== -->
-  <!-- [구글 웹앱 URL] -->
   <script>
-    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzkFrusU7jFbX0_3qJeSNmz7t89TPqvibmzYRlXgBHPFstjonsx68EKQfdfGUdHjW9e/exec";
+    // 기존 URL 유지
+    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxyZ7oec53T-qVzjXmX8rZ8tWCbfOXm_Lpt5HEcwFWAwmOEnjrz3fkFNkynQHvQKjLG/exec";
   </script>
   <!-- ============================================================== -->
 
@@ -46,35 +46,36 @@
     .modal-box { background: white; border-radius: 16px; max-width: 440px; width: 100%; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
 
     /* ============================================================== */
-    /* [A4 인쇄 전용 CSS 수정 - .hidden 클래스를 강제로 제거하여 프린트 출력] */
+    /* [인쇄 백지 현상 완벽 해결 CSS] */
+    /* 화면용(Screen)에서는 인쇄 영역을 원천 차단, 인쇄용(Print)에서는 인쇄 영역만 활성화 */
     /* ============================================================== */
+    @media screen {
+      #printArea { display: none !important; }
+    }
+
     @page {
       size: A4 portrait;
       margin: 15mm;
     }
 
     @media print {
+      /* body 안의 기본 화면 UI는 모두 숨김 */
+      body > *:not(#printArea) { display: none !important; }
+      
       body {
         background: #ffffff !important;
         margin: 0 !important;
         padding: 0 !important;
       }
-      .no-print { display: none !important; }
 
-      #printArea, #printArea.hidden {
+      /* 인쇄 영역만 강제로 화면 최상단에 고정 표시 */
+      #printArea {
         display: block !important;
+        position: static !important;
         visibility: visible !important;
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        text-align: left !important;
-      }
-
-      #printArea * {
-        visibility: visible !important;
       }
 
       table {
@@ -91,28 +92,17 @@
         vertical-align: middle !important;
         word-break: break-all !important;
       }
-      
-      .note-cell {
-        text-align: left !important;
-        padding: 2px 6px !important;
-        line-height: 1.25 !important;
-      }
+      .note-cell { text-align: left !important; padding: 2px 6px !important; line-height: 1.25 !important; }
       .note-sm { font-size: 8.5pt !important; }
       .note-xs { font-size: 7.5pt !important; }
-
-      .sum-total-box {
-        font-weight: 800 !important;
-        color: #0f172a !important;
-        background-color: #f1f5f9 !important;
-        text-align: center !important;
-        font-size: 10pt !important;
-      }
+      .sum-total-box { font-weight: 800 !important; color: #0f172a !important; background-color: #f1f5f9 !important; text-align: center !important; font-size: 10pt !important; }
     }
   </style>
 </head>
 <body>
 
-  <div class="container no-print">
+  <!-- 메인 UI 컨테이너 -->
+  <div class="container">
     <div style="text-align: center; margin-bottom: 16px;">
       <span class="badge-year">2026학년도 양품화</span>
       <h1 class="title-main">노트북 및 부속품 수거 시스템</h1>
@@ -162,7 +152,6 @@
 
       <div class="card">
         <p style="font-size: 14px; font-weight: 700; color: #475569;">제출하는 물품을 터치해 선택하세요.</p>
-        
         <div class="items-grid">
           <button type="button" onclick="toggleItem('laptop')" id="btn-laptop" class="item-btn">
             <span class="item-label">노트북 본체</span>
@@ -189,7 +178,6 @@
         <div id="verifiedNotice" class="hidden" style="margin-bottom: 14px; padding: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #1d4ed8;">
           ✓ 담임 선생님의 현장 확인이 완료되었습니다.
         </div>
-
         <button id="saveBtn" onclick="saveStudentSubmission()" class="btn-action btn-green">제출 완료</button>
       </div>
     </div>
@@ -201,17 +189,14 @@
           <span style="font-size: 11px; color: #64748b; font-weight: bold;">교사 관리 모드</span>
           <h2 id="teacherProfile" style="font-size: 17px; font-weight: 800;"></h2>
         </div>
-        <div style="display: flex; gap: 6px;">
-          <select id="classSelector" onchange="loadClassData()" style="padding: 6px 8px; font-size: 13px; font-weight: bold; border-radius: 8px; border: 1px solid #cbd5e1;">
-            <option value="1">3학년 1반</option>
-            <option value="2">3학년 2반</option>
-            <option value="3">3학년 3반</option>
-            <option value="4">3학년 4반</option>
-            <option value="5">3학년 5반</option>
-            <option value="6">3학년 6반</option>
-            <option value="7">3학년 7반</option>
-            <option value="8">3학년 8반</option>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <select id="classSelector" onchange="renderLocalClassData()" style="padding: 6px 8px; font-size: 13px; font-weight: bold; border-radius: 8px; border: 1px solid #cbd5e1;">
+            <option value="1">3학년 1반</option><option value="2">3학년 2반</option>
+            <option value="3">3학년 3반</option><option value="4">3학년 4반</option>
+            <option value="5">3학년 5반</option><option value="6">3학년 6반</option>
+            <option value="7">3학년 7반</option><option value="8">3학년 8반</option>
           </select>
+          <button onclick="fetchInitialAllData()" class="btn-sub" title="최신 데이터 불러오기">🔄 갱신</button>
           <button onclick="printA4()" class="btn-sub" style="background:#4338ca; color:#fff; border:none;">🖨️ 인쇄</button>
           <button onclick="logout()" class="btn-sub">로그아웃</button>
         </div>
@@ -264,213 +249,104 @@
           <label>비고 / 특이사항 (A4 인쇄 비고란에 반영)</label>
           <textarea id="modalNoteInput" rows="2" placeholder="예: 케이블 피복 손상, 마우스 분실" style="font-size: 13px; resize: none;"></textarea>
         </div>
-
         <button id="modalConfirmBtn" onclick="confirmTeacherVerification()" class="btn-action btn-blue" style="background:#4f46e5;">확인 완료 (저장)</button>
       </div>
     </div>
+  </div> <!-- container 종료 -->
 
-    <!-- [5] A4 인쇄 전용 영역 -->
-    <div id="printArea" class="hidden">
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 8px;">
-        <div>
-          <span style="font-size: 12pt; font-weight: bold;">2026학년도</span>
-          <h1 id="printClassTitle" style="font-size: 20pt; font-weight: 900; margin: 0; line-height: 1.1;">3학년 1반</h1>
-        </div>
-        <div style="font-size: 13pt; font-weight: bold;">
-          담임: <span id="printTeacherName"></span> (인)
-        </div>
+  <!-- [5] A4 인쇄 전용 영역 -->
+  <div id="printArea">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 8px;">
+      <div>
+        <span style="font-size: 12pt; font-weight: bold;">2026학년도</span>
+        <h1 id="printClassTitle" style="font-size: 20pt; font-weight: 900; margin: 0; line-height: 1.1;"></h1>
       </div>
-
-      <table>
-        <thead>
-          <tr style="background-color: #f1f5f9;">
-            <th style="width: 32px;">번호</th>
-            <th style="width: 65px;">성명</th>
-            <th style="width: 45px;">노트북</th>
-            <th style="width: 45px;">마우스</th>
-            <th style="width: 50px;">전원<br>케이블</th>
-            <th style="width: 50px;">전원<br>어댑터</th>
-            <th style="width: 45px;">파우치</th>
-            <th>비고</th>
-          </tr>
-        </thead>
-        <tbody id="printTableBody"></tbody>
-        <tfoot>
-          <tr style="font-weight: bold; background-color: #f8fafc;">
-            <td colspan="2">합계</td>
-            <td id="sum-laptop">0</td>
-            <td id="sum-mouse">0</td>
-            <td id="sum-cable">0</td>
-            <td id="sum-adapter">0</td>
-            <td id="sum-pouch">0</td>
-            <td id="sum-grand-total" class="sum-total-box">총 0개 제출</td>
-          </tr>
-        </tfoot>
-      </table>
+      <div style="font-size: 13pt; font-weight: bold;">
+        담임: <span id="printTeacherName"></span> (인)
+      </div>
     </div>
+    <table>
+      <thead>
+        <tr style="background-color: #f1f5f9;">
+          <th style="width: 32px;">번호</th><th style="width: 65px;">성명</th>
+          <th style="width: 45px;">노트북</th><th style="width: 45px;">마우스</th>
+          <th style="width: 50px;">전원<br>케이블</th><th style="width: 50px;">전원<br>어댑터</th>
+          <th style="width: 45px;">파우치</th><th>비고</th>
+        </tr>
+      </thead>
+      <tbody id="printTableBody"></tbody>
+      <tfoot>
+        <tr style="font-weight: bold; background-color: #f8fafc;">
+          <td colspan="2">합계</td>
+          <td id="sum-laptop">0</td><td id="sum-mouse">0</td>
+          <td id="sum-cable">0</td><td id="sum-adapter">0</td><td id="sum-pouch">0</td>
+          <td id="sum-grand-total" class="sum-total-box">총 0개 제출</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 
-    <script>
-      function callBackend(actionName, params, callback) {
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-          google.script.run.withSuccessHandler(callback)[actionName](...params);
-        } else {
-          fetch(GOOGLE_WEB_APP_URL, {
-            method: 'POST',
-            mode: 'cors',
-            redirect: 'follow',
-            headers: {
-              'Content-Type': 'text/plain;charset=utf-8'
-            },
-            body: JSON.stringify({ action: actionName, payload: params })
-          })
-          .then(response => {
-            if (!response.ok) throw new Error('HTTP 상태 코드: ' + response.status);
-            return response.json();
-          })
-          .then(data => callback(data))
-          .catch(err => {
-            console.error(err);
-            alert('서버 연결 실패!\n(' + err.message + ')');
-          });
-        }
-      }
+  <script>
+    function callBackend(actionName, params, callback) {
+      fetch(GOOGLE_WEB_APP_URL, {
+        method: 'POST', mode: 'cors', redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: actionName, payload: params })
+      })
+      .then(r => r.json()).then(data => callback(data))
+      .catch(err => {
+        console.error(err);
+        alert('서버 연결 실패! 캐시를 비우거나 시크릿 탭을 이용해보세요.\n(' + err.message + ')');
+      });
+    }
 
-      let currentUser = null;
-      let currentStudentItems = { laptop: false, mouse: false, cable: false, adapter: false, pouch: false, verified: false, note: '' };
-      let currentModalStudent = null;
-      let modalItems = {};
+    let currentUser = null;
+    let currentStudentItems = { laptop: false, mouse: false, cable: false, adapter: false, pouch: false, verified: false, note: '' };
+    
+    // ⚡ 캐싱 변수: 교사 로그인 시 전체 학생 데이터를 단 1번만 받아와서 여기에 저장함
+    let globalAllStudents = []; 
+    
+    const teacherNameMap = { 1:'이아름', 2:'김근환', 3:'류하영', 4:'이기동', 5:'강수진', 6:'박준수', 7:'윤지혜', 8:'장지윤' };
 
-      function switchLoginTab(type) {
-        if (type === 'student') {
-          document.getElementById('formStu').classList.remove('hidden');
-          document.getElementById('formTea').classList.add('hidden');
-          document.getElementById('tabStu').classList.add('active');
-          document.getElementById('tabTea').classList.remove('active');
-        } else {
-          document.getElementById('formStu').classList.add('hidden');
-          document.getElementById('formTea').classList.remove('hidden');
-          document.getElementById('tabTea').classList.add('active');
-          document.getElementById('tabStu').classList.remove('active');
-        }
-      }
+    function switchLoginTab(type) {
+      document.getElementById('formStu').classList.toggle('hidden', type !== 'student');
+      document.getElementById('formTea').classList.toggle('hidden', type !== 'teacher');
+      document.getElementById('tabStu').classList.toggle('active', type === 'student');
+      document.getElementById('tabTea').classList.toggle('active', type === 'teacher');
+    }
 
-      function handleStudentLogin() {
-        const id = document.getElementById('stuIdInput').value.trim();
-        const name = document.getElementById('stuNameInput').value.trim();
-        if (!id || !name) return alert('학번과 이름을 모두 입력해주세요.');
+    function handleStudentLogin() {
+      const id = document.getElementById('stuIdInput').value.trim();
+      const name = document.getElementById('stuNameInput').value.trim();
+      if (!id || !name) return alert('학번과 이름을 모두 입력해주세요.');
+      const btn = document.getElementById('btnStuLogin');
+      btn.innerText = '로그인 중...'; btn.disabled = true;
 
-        const btn = document.getElementById('btnStuLogin');
-        btn.innerText = '로그인 중...';
-        btn.disabled = true;
+      callBackend('studentLogin', [id, name], res => {
+        btn.innerText = '학생 로그인'; btn.disabled = false;
+        if (!res.success) return alert(res.message);
+        currentUser = res; currentStudentItems = res.status;
+        showStudentView();
+      });
+    }
 
-        callBackend('studentLogin', [id, name], res => {
-          btn.innerText = '학생 로그인';
-          btn.disabled = false;
-          if (!res.success) return alert(res.message);
-          currentUser = res;
-          currentStudentItems = res.status;
-          showStudentView();
-        });
-      }
+    function handleTeacherLogin() {
+      const id = document.getElementById('teaIdInput').value.trim();
+      const pw = document.getElementById('teaPwInput').value.trim();
+      if (!id || !pw) return alert('아이디와 비밀번호를 입력해주세요.');
+      const btn = document.getElementById('btnTeaLogin');
+      btn.innerText = '로그인 중...'; btn.disabled = true;
 
-      function handleTeacherLogin() {
-        const id = document.getElementById('teaIdInput').value.trim();
-        const pw = document.getElementById('teaPwInput').value.trim();
-        if (!id || !pw) return alert('아이디와 비밀번호를 입력해주세요.');
-
-        const btn = document.getElementById('btnTeaLogin');
-        btn.innerText = '로그인 중...';
-        btn.disabled = true;
-
-        callBackend('teacherLogin', [id, pw], res => {
-          btn.innerText = '교사 로그인';
-          btn.disabled = false;
-          if (!res.success) return alert(res.message);
-          currentUser = res;
-          showTeacherView();
-        });
-      }
-
-      function showStudentView() {
-        document.getElementById('loginView').classList.add('hidden');
-        document.getElementById('studentView').classList.remove('hidden');
-        document.getElementById('stuProfile').innerText = `${currentUser.id} ${currentUser.name}`;
-        updateButtonsUI('btn-', currentStudentItems);
-
-        const saveBtn = document.getElementById('saveBtn');
-
-        if (currentStudentItems.verified) {
-          document.getElementById('verifiedNotice').classList.remove('hidden');
-          saveBtn.disabled = true;
-          saveBtn.innerText = '교사 확인 완료 (수정 불가)';
-          saveBtn.classList.remove('btn-green');
-          saveBtn.style.backgroundColor = '#94a3b8';
-          saveBtn.style.cursor = 'not-allowed';
-        } else {
-          document.getElementById('verifiedNotice').classList.add('hidden');
-          saveBtn.disabled = false;
-          saveBtn.innerText = '제출 완료';
-          saveBtn.classList.add('btn-green');
-          saveBtn.style.backgroundColor = '';
-          saveBtn.style.cursor = 'pointer';
-        }
-      }
-
-      function toggleItem(key) {
-        if (currentStudentItems.verified) {
-          alert('이미 담임 선생님의 확인이 완료되어 수정할 수 없습니다.');
-          return;
-        }
-        currentStudentItems[key] = !currentStudentItems[key];
-        updateButtonsUI('btn-', currentStudentItems);
-      }
-
-      function updateButtonsUI(prefix, stateObj) {
-        const keys = ['laptop', 'mouse', 'cable', 'adapter', 'pouch'];
-        keys.forEach(k => {
-          const btn = document.getElementById(prefix + k);
-          if (stateObj[k]) {
-            btn.classList.add('selected');
-          } else {
-            btn.classList.remove('selected');
-          }
-        });
-      }
-
-      function saveStudentSubmission() {
-        const payload = {
-          role: 'student',
-          id: currentUser.id,
-          name: currentUser.name,
-          laptop: currentStudentItems.laptop,
-          mouse: currentStudentItems.mouse,
-          cable: currentStudentItems.cable,
-          adapter: currentStudentItems.adapter,
-          pouch: currentStudentItems.pouch,
-          verified: currentStudentItems.verified
-        };
-
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.innerText = '저장 중...';
-        saveBtn.disabled = true;
-
-        callBackend('saveSubmission', [payload], res => {
-          saveBtn.innerText = '제출 완료';
-          saveBtn.disabled = false;
-          
-          if (!res.success) {
-            alert(res.message);
-            return;
-          }
-          alert('성공적으로 저장되었습니다!');
-        });
-      }
-
-      function showTeacherView() {
+      callBackend('teacherLogin', [id, pw], res => {
+        btn.innerText = '교사 로그인'; btn.disabled = false;
+        if (!res.success) return alert(res.message);
+        currentUser = res;
+        
+        // ⚡ 교사 로그인 성공 즉시 전체 데이터를 캐싱함
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('teacherView').classList.remove('hidden');
         document.getElementById('teacherProfile').innerText = `${currentUser.name} 접속 중`;
-
+        
         const selector = document.getElementById('classSelector');
         if (currentUser.assignedClass > 0) {
           selector.value = currentUser.assignedClass;
@@ -478,179 +354,193 @@
         } else {
           selector.disabled = false;
         }
-        loadClassData();
-      }
-
-      function loadClassData() {
-        const classNum = parseInt(document.getElementById('classSelector').value, 10);
-        const container = document.getElementById('studentListContainer');
-        container.innerHTML = '<div style="padding:20px; text-align:center; color:#94a3b8;">불러오는 중...</div>';
-
-        callBackend('getClassData', [classNum], data => {
-          renderTeacherStudentList(data.students);
-          preparePrintView(data);
-        });
-      }
-
-      function renderTeacherStudentList(students) {
-        const container = document.getElementById('studentListContainer');
-        container.innerHTML = '';
-        let verifiedCount = 0;
-
-        students.forEach(st => {
-          if (st.verified) verifiedCount++;
-          const div = document.createElement('div');
-          div.className = 'student-item';
-          div.onclick = () => openVerifyModal(st);
-
-          const checkTags = [
-            st.laptop ? '노트북' : null,
-            st.mouse ? '마우스' : null,
-            st.cable ? '케이블' : null,
-            st.adapter ? '어댑터' : null,
-            st.pouch ? '파우치' : null
-          ].filter(Boolean);
-
-          div.innerHTML = `
-            <div style="flex: 1; padding-right: 10px;">
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span style="font-weight:800; font-size:15px;">${st.num}번 ${st.name}</span>
-                <span style="font-size:12px; color:#94a3b8;">(${st.id})</span>
-                ${st.verified ? '<span class="tag-complete">확인완료</span>' : ''}
-              </div>
-              <div style="font-size:12px; color:#64748b; margin-top:2px;">
-                ${checkTags.length > 0 ? checkTags.join(', ') + ' 제출' : '<span style="color:#ef4444;">미제출</span>'}
-              </div>
-              ${st.note ? `<div style="font-size:11px; color:#b45309; margin-top:3px; background:#fef3c7; display:inline-block; padding:1px 6px; border-radius:4px;">📝 ${st.note}</div>` : ''}
-            </div>
-            <span style="color:#4f46e5; font-weight:700; font-size:12px; white-space:nowrap;">검수하기 &rarr;</span>
-          `;
-          container.appendChild(div);
-        });
-
-        document.getElementById('classStats').innerText = `검수 완료: ${verifiedCount} / ${students.length}명`;
-      }
-
-      function openVerifyModal(st) {
-        currentModalStudent = st;
-        modalItems = {
-          laptop: st.laptop,
-          mouse: st.mouse,
-          cable: st.cable,
-          adapter: st.adapter,
-          pouch: st.pouch
-        };
-        document.getElementById('modalStudentTitle').innerText = `${st.classNum}반 ${st.num}번 ${st.name} (${st.id})`;
-        document.getElementById('modalNoteInput').value = st.note || '';
-        updateButtonsUI('mbtn-', modalItems);
-        document.getElementById('verifyModal').classList.remove('hidden');
-      }
-
-      function toggleModalItem(key) {
-        modalItems[key] = !modalItems[key];
-        updateButtonsUI('mbtn-', modalItems);
-      }
-
-      function closeModal() {
-        document.getElementById('verifyModal').classList.add('hidden');
-      }
-
-      function confirmTeacherVerification() {
-        const payload = {
-          role: 'teacher',
-          id: currentModalStudent.id,
-          name: currentModalStudent.name,
-          laptop: modalItems.laptop,
-          mouse: modalItems.mouse,
-          cable: modalItems.cable,
-          adapter: modalItems.adapter,
-          pouch: modalItems.pouch,
-          verified: true,
-          note: document.getElementById('modalNoteInput').value.trim()
-        };
-
-        const btn = document.getElementById('modalConfirmBtn');
-        btn.innerText = '저장 중...';
-        btn.disabled = true;
-
-        callBackend('saveSubmission', [payload], res => {
-          btn.innerText = '확인 완료 (저장)';
-          btn.disabled = false;
-          if (!res.success) {
-            alert(res.message);
-            return;
-          }
-          closeModal();
-          loadClassData();
-        });
-      }
-
-      function preparePrintView(data) {
-        document.getElementById('printClassTitle').innerText = data.className;
-        document.getElementById('printTeacherName').innerText = data.teacherName;
-
-        const tbody = document.getElementById('printTableBody');
-        tbody.innerHTML = '';
-        let sums = { laptop: 0, mouse: 0, cable: 0, adapter: 0, pouch: 0 };
-
-        data.students.forEach(st => {
-          if (st.laptop) sums.laptop++;
-          if (st.mouse) sums.mouse++;
-          if (st.cable) sums.cable++;
-          if (st.adapter) sums.adapter++;
-          if (st.pouch) sums.pouch++;
-
-          const noteText = st.note || '';
-          let noteClass = 'note-cell';
-          if (noteText.length > 25) {
-            noteClass += ' note-xs';
-          } else if (noteText.length > 12) {
-            noteClass += ' note-sm';
-          }
-
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${st.num}</td>
-            <td style="font-weight:700;">${st.name}</td>
-            <td>${st.laptop ? 'O' : ''}</td>
-            <td>${st.mouse ? 'O' : ''}</td>
-            <td>${st.cable ? 'O' : ''}</td>
-            <td>${st.adapter ? 'O' : ''}</td>
-            <td>${st.pouch ? 'O' : ''}</td>
-            <td class="${noteClass}">${noteText}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-
-        document.getElementById('sum-laptop').innerText = sums.laptop;
-        document.getElementById('sum-mouse').innerText = sums.mouse;
-        document.getElementById('sum-cable').innerText = sums.cable;
-        document.getElementById('sum-adapter').innerText = sums.adapter;
-        document.getElementById('sum-pouch').innerText = sums.pouch;
-
-        const grandTotal = sums.laptop + sums.mouse + sums.cable + sums.adapter + sums.pouch;
-        document.getElementById('sum-grand-total').innerText = `총 ${grandTotal}개 제출`;
-      }
-
-      // 인쇄 실행 함수 (DOM 렌더링 동기화 적용)
-      function printA4() {
-        const printArea = document.getElementById('printArea');
-        printArea.classList.remove('hidden');
         
-        setTimeout(() => {
-          window.print();
-          setTimeout(() => {
-            printArea.classList.add('hidden');
-          }, 500);
-        }, 100);
-      }
+        fetchInitialAllData(); // 서버에서 1회 로딩
+      });
+    }
 
-      function logout() {
-        currentUser = null;
-        document.getElementById('studentView').classList.add('hidden');
-        document.getElementById('teacherView').classList.add('hidden');
-        document.getElementById('loginView').classList.remove('hidden');
+    function showStudentView() {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('studentView').classList.remove('hidden');
+      document.getElementById('stuProfile').innerText = `${currentUser.id} ${currentUser.name}`;
+      updateButtonsUI('btn-', currentStudentItems);
+
+      const saveBtn = document.getElementById('saveBtn');
+      if (currentStudentItems.verified) {
+        document.getElementById('verifiedNotice').classList.remove('hidden');
+        saveBtn.disabled = true; saveBtn.innerText = '교사 확인 완료 (수정 불가)';
+        saveBtn.style.backgroundColor = '#94a3b8'; saveBtn.style.cursor = 'not-allowed';
+      } else {
+        document.getElementById('verifiedNotice').classList.add('hidden');
+        saveBtn.disabled = false; saveBtn.innerText = '제출 완료';
+        saveBtn.style.backgroundColor = '#059669'; saveBtn.style.cursor = 'pointer';
       }
-    </script>
+    }
+
+    function toggleItem(key) {
+      if (currentStudentItems.verified) { alert('이미 담임 선생님 확인이 완료되어 수정할 수 없습니다.'); return; }
+      currentStudentItems[key] = !currentStudentItems[key];
+      updateButtonsUI('btn-', currentStudentItems);
+    }
+
+    function updateButtonsUI(prefix, stateObj) {
+      ['laptop', 'mouse', 'cable', 'adapter', 'pouch'].forEach(k => {
+        const btn = document.getElementById(prefix + k);
+        stateObj[k] ? btn.classList.add('selected') : btn.classList.remove('selected');
+      });
+    }
+
+    function saveStudentSubmission() {
+      const payload = {
+        role: 'student', id: currentUser.id, name: currentUser.name,
+        ...currentStudentItems
+      };
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.innerText = '저장 중...'; saveBtn.disabled = true;
+
+      callBackend('saveSubmission', [payload], res => {
+        saveBtn.innerText = '제출 완료'; saveBtn.disabled = false;
+        if (!res.success) return alert(res.message);
+        alert('성공적으로 저장되었습니다!');
+      });
+    }
+
+    // ⚡ 서버에서 1번만 데이터를 통째로 불러오는 함수
+    function fetchInitialAllData() {
+      const container = document.getElementById('studentListContainer');
+      container.innerHTML = '<div style="padding:20px; text-align:center; font-weight:bold; color:#2563eb;">서버에서 명단을 불러오는 중입니다...</div>';
+      
+      callBackend('getAllData', [], data => {
+        globalAllStudents = data; // 메모리에 전체 저장
+        renderLocalClassData(); // 지연 없이 즉시 화면에 그리기
+      });
+    }
+
+    // ⚡ 반 변경 시 서버 통신 없이 즉시(0초) 화면 렌더링하는 함수
+    function renderLocalClassData() {
+      const classNum = parseInt(document.getElementById('classSelector').value, 10);
+      
+      // 메모리에 있는 전체 명단 중 선택된 반만 필터링 (0초 소요)
+      const filteredStudents = globalAllStudents.filter(st => st.classNum === classNum);
+      
+      renderTeacherStudentList(filteredStudents);
+      preparePrintView(classNum, filteredStudents);
+    }
+
+    function renderTeacherStudentList(students) {
+      const container = document.getElementById('studentListContainer');
+      container.innerHTML = '';
+      let verifiedCount = 0;
+
+      students.forEach(st => {
+        if (st.verified) verifiedCount++;
+        const div = document.createElement('div');
+        div.className = 'student-item';
+        div.onclick = () => openVerifyModal(st);
+
+        const checkTags = [st.laptop ? '노트북' : null, st.mouse ? '마우스' : null, st.cable ? '케이블' : null, st.adapter ? '어댑터' : null, st.pouch ? '파우치' : null].filter(Boolean);
+
+        div.innerHTML = `
+          <div style="flex: 1; padding-right: 10px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-weight:800; font-size:15px;">${st.num}번 ${st.name}</span>
+              <span style="font-size:12px; color:#94a3b8;">(${st.id})</span>
+              ${st.verified ? '<span class="tag-complete">확인완료</span>' : ''}
+            </div>
+            <div style="font-size:12px; color:#64748b; margin-top:2px;">
+              ${checkTags.length > 0 ? checkTags.join(', ') + ' 제출' : '<span style="color:#ef4444;">미제출</span>'}
+            </div>
+            ${st.note ? `<div style="font-size:11px; color:#b45309; margin-top:3px; background:#fef3c7; display:inline-block; padding:1px 6px; border-radius:4px;">📝 ${st.note}</div>` : ''}
+          </div>
+          <span style="color:#4f46e5; font-weight:700; font-size:12px; white-space:nowrap;">검수하기 &rarr;</span>
+        `;
+        container.appendChild(div);
+      });
+      document.getElementById('classStats').innerText = `검수 완료: ${verifiedCount} / ${students.length}명`;
+    }
+
+    let currentModalStudent = null; let modalItems = {};
+
+    function openVerifyModal(st) {
+      currentModalStudent = st;
+      modalItems = { laptop: st.laptop, mouse: st.mouse, cable: st.cable, adapter: st.adapter, pouch: st.pouch };
+      document.getElementById('modalStudentTitle').innerText = `${st.classNum}반 ${st.num}번 ${st.name} (${st.id})`;
+      document.getElementById('modalNoteInput').value = st.note || '';
+      updateButtonsUI('mbtn-', modalItems);
+      document.getElementById('verifyModal').classList.remove('hidden');
+    }
+
+    function toggleModalItem(key) { modalItems[key] = !modalItems[key]; updateButtonsUI('mbtn-', modalItems); }
+    function closeModal() { document.getElementById('verifyModal').classList.add('hidden'); }
+
+    // ⚡ 교사 확인 저장 (서버 저장과 동시에 로컬 캐시도 즉시 업데이트하여 로딩을 생략함)
+    function confirmTeacherVerification() {
+      const payload = {
+        role: 'teacher', id: currentModalStudent.id, name: currentModalStudent.name,
+        ...modalItems, verified: true, note: document.getElementById('modalNoteInput').value.trim()
+      };
+      const btn = document.getElementById('modalConfirmBtn');
+      btn.innerText = '저장 중...'; btn.disabled = true;
+
+      callBackend('saveSubmission', [payload], res => {
+        btn.innerText = '확인 완료 (저장)'; btn.disabled = false;
+        if (!res.success) return alert(res.message);
+        
+        // ⚡ 로컬 데이터 즉시 업데이트 (서버 다시 부를 필요 없음!)
+        const st = globalAllStudents.find(s => s.id === payload.id);
+        if (st) {
+          Object.assign(st, modalItems);
+          st.verified = true;
+          st.note = payload.note;
+        }
+        
+        closeModal();
+        renderLocalClassData(); // 로컬에서 즉시 렌더링 (0초 소요)
+      });
+    }
+
+    function preparePrintView(classNum, students) {
+      document.getElementById('printClassTitle').innerText = `3학년 ${classNum}반`;
+      document.getElementById('printTeacherName').innerText = teacherNameMap[classNum] || '';
+      const tbody = document.getElementById('printTableBody'); tbody.innerHTML = '';
+      let sums = { laptop: 0, mouse: 0, cable: 0, adapter: 0, pouch: 0 };
+
+      students.forEach(st => {
+        if (st.laptop) sums.laptop++; if (st.mouse) sums.mouse++;
+        if (st.cable) sums.cable++; if (st.adapter) sums.adapter++; if (st.pouch) sums.pouch++;
+        
+        let nClass = 'note-cell';
+        if (st.note && st.note.length > 25) nClass += ' note-xs';
+        else if (st.note && st.note.length > 12) nClass += ' note-sm';
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${st.num}</td><td style="font-weight:700;">${st.name}</td>
+            <td>${st.laptop ? 'O' : ''}</td><td>${st.mouse ? 'O' : ''}</td>
+            <td>${st.cable ? 'O' : ''}</td><td>${st.adapter ? 'O' : ''}</td>
+            <td>${st.pouch ? 'O' : ''}</td><td class="${nClass}">${st.note || ''}</td>
+          </tr>`;
+      });
+      document.getElementById('sum-laptop').innerText = sums.laptop;
+      document.getElementById('sum-mouse').innerText = sums.mouse;
+      document.getElementById('sum-cable').innerText = sums.cable;
+      document.getElementById('sum-adapter').innerText = sums.adapter;
+      document.getElementById('sum-pouch').innerText = sums.pouch;
+      document.getElementById('sum-grand-total').innerText = `총 ${Object.values(sums).reduce((a,b)=>a+b, 0)}개 제출`;
+    }
+
+    // ⚡ 완벽히 해결된 백지 인쇄 함수 (JS 숨김/해제 로직 원천 제거)
+    function printA4() {
+      window.print(); 
+    }
+
+    function logout() {
+      currentUser = null;
+      globalAllStudents = []; // 로그아웃 시 캐시 비우기
+      document.getElementById('studentView').classList.add('hidden');
+      document.getElementById('teacherView').classList.add('hidden');
+      document.getElementById('loginView').classList.remove('hidden');
+    }
+  </script>
 </body>
 </html>
