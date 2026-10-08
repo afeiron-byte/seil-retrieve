@@ -8,7 +8,7 @@
   <!-- ============================================================== -->
   <!-- [구글 웹앱 URL] -->
   <script>
-    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx6sQdZEruJLfiYKBD-FrRycomI_x_a_3JOxPMtgCMFYjkohKTFVLLEoa0VnwsOG82H/exec";
+    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyvzr9_UHwYsU6tCjzwmBTV-vcVc0MRtxRU_rtK0NAwnnvO4z9ti5F6VsRh88L4OY0o/exec";
   </script>
   <!-- ============================================================== -->
 
@@ -25,8 +25,8 @@
     .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px; }
-    .form-group input, .form-group select { width: 100%; padding: 12px; font-size: 15px; border: 1px solid #cbd5e1; border-radius: 10px; outline: none; background: #fff; }
-    .form-group input:focus, .form-group select:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; font-size: 15px; border: 1px solid #cbd5e1; border-radius: 10px; outline: none; background: #fff; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
     .btn-action { width: 100%; padding: 14px; font-size: 16px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: 0.2s; }
     .btn-blue { background-color: #2563eb; color: #ffffff; }
     .btn-dark { background-color: #1e293b; color: #ffffff; }
@@ -43,15 +43,64 @@
     .student-item:hover { background-color: #f8fafc; }
     .tag-complete { background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 999; }
-    .modal-box { background: white; border-radius: 16px; max-width: 420px; width: 100%; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .modal-box { background: white; border-radius: 16px; max-width: 440px; width: 100%; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+
+    /* ============================================================== */
+    /* [A4 인쇄 전용 CSS] 상하좌우 20mm 여백, 좌측 상단 정렬, 비고란 여백 확장 */
+    /* ============================================================== */
+    @page {
+      size: A4 portrait;
+      margin: 20mm;
+    }
+
     @media print {
+      body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 10mm; background: white; }
-      @page { size: A4 portrait; margin: 10mm; }
+      #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-align: left !important;
+      }
       .no-print { display: none !important; }
-      table { border-collapse: collapse !important; width: 100% !important; margin-top: 10px; }
-      th, td { border: 1px solid #000 !important; font-size: 11pt !important; padding: 5px !important; text-align: center !important; }
+      table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        table-layout: fixed !important;
+        margin-top: 10px;
+      }
+      th, td {
+        border: 1px solid #000 !important;
+        font-size: 10pt !important;
+        padding: 4px 2px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        word-break: break-all !important;
+      }
+      
+      .note-cell {
+        text-align: left !important;
+        padding: 2px 6px !important;
+        line-height: 1.25 !important;
+      }
+      .note-sm { font-size: 8.5pt !important; }
+      .note-xs { font-size: 7.5pt !important; }
+
+      .sum-total-box {
+        font-weight: 800 !important;
+        color: #0f172a !important;
+        background-color: #f1f5f9 !important;
+        text-align: center !important;
+        font-size: 10pt !important;
+      }
     }
   </style>
 </head>
@@ -73,11 +122,11 @@
       <div id="formStu">
         <div class="form-group">
           <label>학번 (5자리)</label>
-          <input type="number" id="stuIdInput" placeholder="예: 30101">
+          <input type="number" id="stuIdInput" placeholder="예: 10101">
         </div>
         <div class="form-group">
           <label>이름</label>
-          <input type="text" id="stuNameInput" placeholder="예: 강동우">
+          <input type="text" id="stuNameInput" placeholder="예: 홍길동">
         </div>
         <button id="btnStuLogin" onclick="handleStudentLogin()" class="btn-action btn-blue">학생 로그인</button>
       </div>
@@ -175,7 +224,7 @@
   <!-- [4] 교사용 검수 팝업 모달 -->
   <div id="verifyModal" class="modal-overlay hidden">
     <div class="modal-box">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <div>
           <span style="font-size: 11px; font-weight: 700; color: #4f46e5;">제출 물품 현장 검수</span>
           <h3 id="modalStudentTitle" style="font-size: 17px; font-weight: 900;"></h3>
@@ -183,27 +232,32 @@
         <button onclick="closeModal()" style="border: none; background: none; font-size: 22px; cursor: pointer; color: #94a3b8;">&times;</button>
       </div>
 
-      <div class="items-grid" style="margin-bottom: 16px;">
-        <button type="button" onclick="toggleModalItem('laptop')" id="mbtn-laptop" class="item-btn" style="height:65px;">
-          <span class="item-label" style="font-size:14px;">노트북</span>
+      <div class="items-grid" style="margin-bottom: 12px;">
+        <button type="button" onclick="toggleModalItem('laptop')" id="mbtn-laptop" class="item-btn" style="height:62px;">
+          <span class="item-label" style="font-size:13px;">노트북</span>
           <span id="mbadge-laptop" class="item-badge">● 제출됨</span>
         </button>
-        <button type="button" onclick="toggleModalItem('mouse')" id="mbtn-mouse" class="item-btn" style="height:65px;">
-          <span class="item-label" style="font-size:14px;">마우스</span>
+        <button type="button" onclick="toggleModalItem('mouse')" id="mbtn-mouse" class="item-btn" style="height:62px;">
+          <span class="item-label" style="font-size:13px;">마우스</span>
           <span id="mbadge-mouse" class="item-badge">● 제출됨</span>
         </button>
-        <button type="button" onclick="toggleModalItem('cable')" id="mbtn-cable" class="item-btn" style="height:65px;">
-          <span class="item-label" style="font-size:14px;">전원케이블</span>
+        <button type="button" onclick="toggleModalItem('cable')" id="mbtn-cable" class="item-btn" style="height:62px;">
+          <span class="item-label" style="font-size:13px;">전원케이블</span>
           <span id="mbadge-cable" class="item-badge">● 제출됨</span>
         </button>
-        <button type="button" onclick="toggleModalItem('adapter')" id="mbtn-adapter" class="item-btn" style="height:65px;">
-          <span class="item-label" style="font-size:14px;">전원어댑터</span>
+        <button type="button" onclick="toggleModalItem('adapter')" id="mbtn-adapter" class="item-btn" style="height:62px;">
+          <span class="item-label" style="font-size:13px;">전원어댑터</span>
           <span id="mbadge-adapter" class="item-badge">● 제출됨</span>
         </button>
-        <button type="button" onclick="toggleModalItem('pouch')" id="mbtn-pouch" class="item-btn" style="height:65px; grid-column: span 2;">
-          <span class="item-label" style="font-size:14px;">파우치</span>
+        <button type="button" onclick="toggleModalItem('pouch')" id="mbtn-pouch" class="item-btn" style="height:62px; grid-column: span 2;">
+          <span class="item-label" style="font-size:13px;">파우치</span>
           <span id="mbadge-pouch" class="item-badge">● 제출됨</span>
         </button>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 14px;">
+        <label>비고 / 특이사항 (A4 인쇄 비고란에 반영)</label>
+        <textarea id="modalNoteInput" rows="2" placeholder="예: 케이블 피복 손상, 마우스 분실" style="font-size: 13px; resize: none;"></textarea>
       </div>
 
       <button id="modalConfirmBtn" onclick="confirmTeacherVerification()" class="btn-action btn-blue" style="background:#4f46e5;">확인 완료 (저장)</button>
@@ -212,10 +266,10 @@
 
   <!-- [5] A4 인쇄 전용 영역 -->
   <div id="printArea" class="hidden">
-    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 10px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 8px;">
       <div>
-        <span style="font-size: 13pt; font-weight: bold;">2026학년도</span>
-        <h1 id="printClassTitle" style="font-size: 22pt; font-weight: 900; margin: 0;">3학년 1반</h1>
+        <span style="font-size: 12pt; font-weight: bold;">2026학년도</span>
+        <h1 id="printClassTitle" style="font-size: 20pt; font-weight: 900; margin: 0; line-height: 1.1;">3학년 1반</h1>
       </div>
       <div style="font-size: 13pt; font-weight: bold;">
         담임: <span id="printTeacherName"></span> (인)
@@ -225,14 +279,14 @@
     <table>
       <thead>
         <tr style="background-color: #f1f5f9;">
-          <th style="width: 8%;">번호</th>
-          <th style="width: 16%;">성명</th>
-          <th style="width: 14%;">노트북</th>
-          <th style="width: 14%;">마우스</th>
-          <th style="width: 16%;">전원<br>케이블</th>
-          <th style="width: 16%;">전원<br>어댑터</th>
-          <th style="width: 14%;">파우치</th>
-          <th style="width: 12%;">비고</th>
+          <th style="width: 32px;">번호</th>
+          <th style="width: 65px;">성명</th>
+          <th style="width: 45px;">노트북</th>
+          <th style="width: 45px;">마우스</th>
+          <th style="width: 50px;">전원<br>케이블</th>
+          <th style="width: 50px;">전원<br>어댑터</th>
+          <th style="width: 45px;">파우치</th>
+          <th>비고</th>
         </tr>
       </thead>
       <tbody id="printTableBody"></tbody>
@@ -244,14 +298,14 @@
           <td id="sum-cable">0</td>
           <td id="sum-adapter">0</td>
           <td id="sum-pouch">0</td>
-          <td></td>
+          <!-- 모든 부속품 총합 수량 표시 -->
+          <td id="sum-grand-total" class="sum-total-box">총 0개 제출</td>
         </tr>
       </tfoot>
     </table>
   </div>
 
   <script>
-    // 통합 API 호출 함수 (CORS 및 리다이렉트 대응)
     function callBackend(actionName, params, callback) {
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(callback)[actionName](...params);
@@ -272,13 +326,13 @@
         .then(data => callback(data))
         .catch(err => {
           console.error(err);
-          alert('서버 연결 실패!\n구글 웹앱 설정에서 [액세스 권한: 모든 사용자(Anyone)]로 새 버전을 배포했는지 확인해 주세요.\n(' + err.message + ')');
+          alert('서버 연결 실패!\n(' + err.message + ')');
         });
       }
     }
 
     let currentUser = null;
-    let currentStudentItems = { laptop: false, mouse: false, cable: false, adapter: false, pouch: false, verified: false };
+    let currentStudentItems = { laptop: false, mouse: false, cable: false, adapter: false, pouch: false, verified: false, note: '' };
     let currentModalStudent = null;
     let modalItems = {};
 
@@ -432,7 +486,7 @@
         ].filter(Boolean);
 
         div.innerHTML = `
-          <div>
+          <div style="flex: 1; padding-right: 10px;">
             <div style="display:flex; align-items:center; gap:6px;">
               <span style="font-weight:800; font-size:15px;">${st.num}번 ${st.name}</span>
               <span style="font-size:12px; color:#94a3b8;">(${st.id})</span>
@@ -441,8 +495,9 @@
             <div style="font-size:12px; color:#64748b; margin-top:2px;">
               ${checkTags.length > 0 ? checkTags.join(', ') + ' 제출' : '<span style="color:#ef4444;">미제출</span>'}
             </div>
+            ${st.note ? `<div style="font-size:11px; color:#b45309; margin-top:3px; background:#fef3c7; display:inline-block; padding:1px 6px; border-radius:4px;">📝 ${st.note}</div>` : ''}
           </div>
-          <span style="color:#4f46e5; font-weight:700; font-size:12px;">검수하기 &rarr;</span>
+          <span style="color:#4f46e5; font-weight:700; font-size:12px; white-space:nowrap;">검수하기 &rarr;</span>
         `;
         container.appendChild(div);
       });
@@ -460,6 +515,7 @@
         pouch: st.pouch
       };
       document.getElementById('modalStudentTitle').innerText = `${st.classNum}반 ${st.num}번 ${st.name} (${st.id})`;
+      document.getElementById('modalNoteInput').value = st.note || '';
       updateButtonsUI('mbtn-', modalItems);
       document.getElementById('verifyModal').classList.remove('hidden');
     }
@@ -482,7 +538,8 @@
         cable: modalItems.cable,
         adapter: modalItems.adapter,
         pouch: modalItems.pouch,
-        verified: true
+        verified: true,
+        note: document.getElementById('modalNoteInput').value.trim()
       };
 
       const btn = document.getElementById('modalConfirmBtn');
@@ -497,6 +554,7 @@
       });
     }
 
+    // A4 인쇄 서식 세팅 (총 제출 수량 합산 표시 기능 포함)
     function preparePrintView(data) {
       document.getElementById('printClassTitle').innerText = data.className;
       document.getElementById('printTeacherName').innerText = data.teacherName;
@@ -512,6 +570,14 @@
         if (st.adapter) sums.adapter++;
         if (st.pouch) sums.pouch++;
 
+        const noteText = st.note || '';
+        let noteClass = 'note-cell';
+        if (noteText.length > 25) {
+          noteClass += ' note-xs';
+        } else if (noteText.length > 12) {
+          noteClass += ' note-sm';
+        }
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${st.num}</td>
@@ -521,16 +587,21 @@
           <td>${st.cable ? 'O' : ''}</td>
           <td>${st.adapter ? 'O' : ''}</td>
           <td>${st.pouch ? 'O' : ''}</td>
-          <td>${st.verified ? '확인' : ''}</td>
+          <td class="${noteClass}">${noteText}</td>
         `;
         tbody.appendChild(tr);
       });
 
+      // 각 품목별 수량 반영[cite: 1, 2, 3, 4, 5, 6, 7, 8]
       document.getElementById('sum-laptop').innerText = sums.laptop;
       document.getElementById('sum-mouse').innerText = sums.mouse;
       document.getElementById('sum-cable').innerText = sums.cable;
       document.getElementById('sum-adapter').innerText = sums.adapter;
       document.getElementById('sum-pouch').innerText = sums.pouch;
+
+      // 전체 물품 총합 수량 계산 및 하단 우측 표시
+      const grandTotal = sums.laptop + sums.mouse + sums.cable + sums.adapter + sums.pouch;
+      document.getElementById('sum-grand-total').innerText = `총 ${grandTotal}개 제출`;
     }
 
     function printA4() {
