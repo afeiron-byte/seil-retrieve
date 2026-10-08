@@ -2,147 +2,152 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>단말기 및 부속품 수거 시스템</title>
-  <script src="https://script.google.com/a/macros/icedu.kr/s/AKfycbwHl8dooypTsGyJODUozHzeL9SuWSTI380FB2Md_EpQEbXf4hJHxA5GmSPA7EDhFIqc/exec"></script>
-  <style>
-    /* 스마트폰 터치 반응 효과 */
-    .item-btn {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      -webkit-tap-highlight-color: transparent;
-    }
-    .item-btn.active {
-      background-color: #ecfdf5 !important; /* 옅은 에메랄드/녹색 */
-      border-color: #10b981 !important;
-      color: #065f46 !important;
-    }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>2026학년도 노트북 및 부속품 수거 시스템</title>
 
-    /* A4 인쇄 전용 CSS (PDF 명렬표 규격 완벽 대응) */
+  <!-- ============================================================== -->
+  <!-- [★ 여기에 구글 웹앱 URL을 입력하세요 ★] -->
+  <script>
+    const GOOGLE_WEB_APP_URL = "https://script.google.com/a/macros/icedu.kr/s/AKfycbwHl8dooypTsGyJODUozHzeL9SuWSTI380FB2Md_EpQEbXf4hJHxA5GmSPA7EDhFIqc/exec";
+  </script>
+  <!-- ============================================================== -->
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif; }
+    body { background-color: #f1f5f9; color: #1e293b; padding: 16px; min-height: 100vh; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .hidden { display: none !important; }
+    .card { background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; margin-bottom: 16px; }
+    .badge-year { display: inline-block; background-color: #dbeafe; color: #1d4ed8; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 9999px; margin-bottom: 8px; }
+    .title-main { font-size: 22px; font-weight: 900; color: #0f172a; text-align: center; margin-bottom: 20px; }
+    .tab-container { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
+    .tab-btn { flex: 1; padding: 12px; font-size: 15px; font-weight: 700; background: none; border: none; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px; }
+    .form-group input, .form-group select { width: 100%; padding: 12px; font-size: 15px; border: 1px solid #cbd5e1; border-radius: 10px; outline: none; background: #fff; }
+    .form-group input:focus, .form-group select:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
+    .btn-action { width: 100%; padding: 14px; font-size: 16px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+    .btn-blue { background-color: #2563eb; color: #ffffff; }
+    .btn-dark { background-color: #1e293b; color: #ffffff; }
+    .btn-green { background-color: #059669; color: #ffffff; }
+    .btn-sub { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+    .items-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+    .item-btn { position: relative; height: 75px; background: #ffffff; border: 2px solid #e2e8f0; border-radius: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s ease; }
+    .item-btn .item-label { font-size: 15px; font-weight: 700; color: #334155; }
+    .item-btn .item-badge { display: none; font-size: 11px; font-weight: 800; color: #059669; margin-top: 2px; }
+    .item-btn.selected { background-color: #ecfdf5 !important; border-color: #10b981 !important; }
+    .item-btn.selected .item-label { color: #065f46 !important; }
+    .item-btn.selected .item-badge { display: block !important; }
+    .student-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+    .student-item:hover { background-color: #f8fafc; }
+    .tag-complete { background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 999; }
+    .modal-box { background: white; border-radius: 16px; max-width: 420px; width: 100%; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
-      #printArea {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      @page {
-        size: A4 portrait;
-        margin: 12mm 15mm 12mm 15mm;
-      }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 10mm; background: white; }
+      @page { size: A4 portrait; margin: 10mm; }
       .no-print { display: none !important; }
-      table { border-collapse: collapse !important; width: 100% !important; }
-      th, td { border: 1px solid #000 !important; font-size: 11pt !important; padding: 4px !important; text-align: center !important; }
+      table { border-collapse: collapse !important; width: 100% !important; margin-top: 10px; }
+      th, td { border: 1px solid #000 !important; font-size: 11pt !important; padding: 5px !important; text-align: center !important; }
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
+<body>
 
-  <div class="max-w-2xl mx-auto p-4 sm:p-6 no-print">
-    <!-- 헤더 -->
-    <header class="text-center mb-6">
-      <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 font-semibold rounded-full text-xs mb-2">2026학년도 양품화</span>
-      <h1 class="text-2xl font-black text-slate-900 tracking-tight">노트북 및 부속품 수거 시스템</h1>
-    </header>
+  <div class="container no-print">
+    <div style="text-align: center; margin-bottom: 16px;">
+      <span class="badge-year">2026학년도 양품화</span>
+      <h1 class="title-main">노트북 및 부속품 수거 시스템</h1>
+    </div>
 
     <!-- [1] 로그인 섹션 -->
-    <div id="loginView" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-      <!-- 탭 선택 -->
-      <div class="flex border-b border-slate-200 mb-6">
-        <button id="tabStu" onclick="switchLoginTab('student')" class="flex-1 py-3 font-bold text-center border-b-2 border-blue-600 text-blue-600">학생 로그인</button>
-        <button id="tabTea" onclick="switchLoginTab('teacher')" class="flex-1 py-3 font-semibold text-center text-slate-400 border-b-2 border-transparent">교사 로그인</button>
+    <div id="loginView" class="card">
+      <div class="tab-container">
+        <button id="tabStu" onclick="switchLoginTab('student')" class="tab-btn active">학생 로그인</button>
+        <button id="tabTea" onclick="switchLoginTab('teacher')" class="tab-btn">교사 로그인</button>
       </div>
 
-      <!-- 학생 로그인 폼 -->
-      <div id="formStu" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">학번 (5자리)</label>
-          <input type="number" id="stuIdInput" placeholder="예: 30101" class="w-full text-base p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+      <div id="formStu">
+        <div class="form-group">
+          <label>학번 (5자리)</label>
+          <input type="number" id="stuIdInput" placeholder="예: 30101">
         </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">이름</label>
-          <input type="text" id="stuNameInput" placeholder="예: 홍길동" class="w-full text-base p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        <div class="form-group">
+          <label>이름</label>
+          <input type="text" id="stuNameInput" placeholder="예: 강동우">
         </div>
-        <button onclick="handleStudentLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow transition">로그인</button>
+        <button onclick="handleStudentLogin()" class="btn-action btn-blue">학생 로그인</button>
       </div>
 
-      <!-- 교사 로그인 폼 -->
-      <div id="formTea" class="space-y-4 hidden">
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">교사 아이디</label>
-          <input type="text" id="teaIdInput" placeholder="예: Class1 또는 3rdhead" class="w-full text-base p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+      <div id="formTea" class="hidden">
+        <div class="form-group">
+          <label>교사 아이디</label>
+          <input type="text" id="teaIdInput" placeholder="예: Class1 또는 3rdhead">
         </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">비밀번호</label>
-          <input type="password" id="teaPwInput" placeholder="비밀번호 입력" class="w-full text-base p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        <div class="form-group">
+          <label>비밀번호</label>
+          <input type="password" id="teaPwInput" placeholder="비밀번호 입력">
         </div>
-        <button onclick="handleTeacherLogin()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl shadow transition">교사 로그인</button>
+        <button onclick="handleTeacherLogin()" class="btn-action btn-dark">교사 로그인</button>
       </div>
     </div>
 
-    <!-- [2] 학생 제출 화면 (스마트폰 버튼 인터페이스) -->
-    <div id="studentView" class="hidden space-y-4">
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex justify-between items-center">
+    <!-- [2] 학생 제출 화면 -->
+    <div id="studentView" class="hidden">
+      <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px;">
         <div>
-          <span class="text-xs text-slate-400 font-semibold">학생 제출 모드</span>
-          <h2 id="stuProfile" class="text-lg font-bold text-slate-800"></h2>
+          <span style="font-size: 11px; color: #64748b; font-weight: bold;">학생 제출 모드</span>
+          <h2 id="stuProfile" style="font-size: 17px; font-weight: 800;"></h2>
         </div>
-        <button onclick="logout()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg">로그아웃</button>
+        <button onclick="logout()" class="btn-sub">로그아웃</button>
       </div>
 
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-        <p class="text-sm font-semibold text-slate-600 mb-4">제출하는 물품을 터치해 선택하세요.</p>
+      <div class="card">
+        <p style="font-size: 14px; font-weight: 700; color: #475569;">제출하는 물품을 터치해 선택하세요.</p>
         
-        <!-- 5가지 물품 버튼 그리드 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-          <button type="button" onclick="toggleItem('laptop')" id="btn-laptop" class="item-btn relative h-20 border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center bg-white shadow-sm">
-            <span class="text-base font-bold">노트북 본체</span>
-            <span id="badge-laptop" class="hidden text-[11px] font-bold text-emerald-600 mt-0.5">● 제출됨</span>
+        <div class="items-grid">
+          <button type="button" onclick="toggleItem('laptop')" id="btn-laptop" class="item-btn">
+            <span class="item-label">노트북 본체</span>
+            <span id="badge-laptop" class="item-badge">● 제출됨</span>
           </button>
-
-          <button type="button" onclick="toggleItem('mouse')" id="btn-mouse" class="item-btn relative h-20 border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center bg-white shadow-sm">
-            <span class="text-base font-bold">마우스</span>
-            <span id="badge-mouse" class="hidden text-[11px] font-bold text-emerald-600 mt-0.5">● 제출됨</span>
+          <button type="button" onclick="toggleItem('mouse')" id="btn-mouse" class="item-btn">
+            <span class="item-label">마우스</span>
+            <span id="badge-mouse" class="item-badge">● 제출됨</span>
           </button>
-
-          <button type="button" onclick="toggleItem('cable')" id="btn-cable" class="item-btn relative h-20 border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center bg-white shadow-sm">
-            <span class="text-base font-bold">전원 케이블</span>
-            <span id="badge-cable" class="hidden text-[11px] font-bold text-emerald-600 mt-0.5">● 제출됨</span>
+          <button type="button" onclick="toggleItem('cable')" id="btn-cable" class="item-btn">
+            <span class="item-label">전원 케이블</span>
+            <span id="badge-cable" class="item-badge">● 제출됨</span>
           </button>
-
-          <button type="button" onclick="toggleItem('adapter')" id="btn-adapter" class="item-btn relative h-20 border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center bg-white shadow-sm">
-            <span class="text-base font-bold">전원 어댑터</span>
-            <span id="badge-adapter" class="hidden text-[11px] font-bold text-emerald-600 mt-0.5">● 제출됨</span>
+          <button type="button" onclick="toggleItem('adapter')" id="btn-adapter" class="item-btn">
+            <span class="item-label">전원 어댑터</span>
+            <span id="badge-adapter" class="item-badge">● 제출됨</span>
           </button>
-
-          <button type="button" onclick="toggleItem('pouch')" id="btn-pouch" class="item-btn relative h-20 border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center bg-white shadow-sm sm:col-span-2">
-            <span class="text-base font-bold">노트북 파우치</span>
-            <span id="badge-pouch" class="hidden text-[11px] font-bold text-emerald-600 mt-0.5">● 제출됨</span>
+          <button type="button" onclick="toggleItem('pouch')" id="btn-pouch" class="item-btn" style="grid-column: span 2;">
+            <span class="item-label">노트북 파우치</span>
+            <span id="badge-pouch" class="item-badge">● 제출됨</span>
           </button>
         </div>
 
-        <div id="verifiedNotice" class="hidden mb-4 p-3 bg-blue-50 border border-blue-200 text-blue-700 text-xs rounded-xl text-center font-bold">
+        <div id="verifiedNotice" class="hidden" style="margin-bottom: 14px; padding: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #1d4ed8;">
           ✓ 담임 선생님의 현장 확인이 완료되었습니다.
         </div>
 
-        <button id="saveBtn" onclick="saveStudentSubmission()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-4 rounded-xl shadow-md transition text-lg">
-          제출 완료
-        </button>
+        <button id="saveBtn" onclick="saveStudentSubmission()" class="btn-action btn-green">제출 완료</button>
       </div>
     </div>
 
     <!-- [3] 교사 대시보드 화면 -->
-    <div id="teacherView" class="hidden space-y-5">
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
+    <div id="teacherView" class="hidden">
+      <div class="card" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
         <div>
-          <span class="text-xs text-slate-400 font-semibold">교사 관리 모드</span>
-          <h2 id="teacherProfile" class="text-lg font-bold text-slate-800"></h2>
+          <span style="font-size: 11px; color: #64748b; font-weight: bold;">교사 관리 모드</span>
+          <h2 id="teacherProfile" style="font-size: 17px; font-weight: 800;"></h2>
         </div>
-        <div class="flex items-center gap-2">
-          <!-- 학급 선택 셀렉트 -->
-          <select id="classSelector" onchange="loadClassData()" class="p-2 border rounded-xl font-bold text-sm bg-slate-50 outline-none">
+        <div style="display: flex; gap: 6px;">
+          <select id="classSelector" onchange="loadClassData()" style="padding: 6px 8px; font-size: 13px; font-weight: bold; border-radius: 8px; border: 1px solid #cbd5e1;">
             <option value="1">3학년 1반</option>
             <option value="2">3학년 2반</option>
             <option value="3">3학년 3반</option>
@@ -152,75 +157,68 @@
             <option value="7">3학년 7반</option>
             <option value="8">3학년 8반</option>
           </select>
-          <button onclick="printA4()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2.5 rounded-xl shadow transition">
-            🖨️ A4 인쇄
-          </button>
-          <button onclick="logout()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2.5 rounded-xl">로그아웃</button>
+          <button onclick="printA4()" class="btn-sub" style="background:#4338ca; color:#fff; border:none;">🖨️ 인쇄</button>
+          <button onclick="logout()" class="btn-sub">로그아웃</button>
         </div>
       </div>
 
-      <!-- 교사용 학생 명단 리스트 -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-          <span class="font-bold text-sm text-slate-700">학생을 터치하여 수거 검수를 진행하세요.</span>
-          <span id="classStats" class="text-xs font-bold text-blue-600"></span>
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 12px 16px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 13px; font-weight: 700; color: #475569;">학생 명단 (터치하여 검수)</span>
+          <span id="classStats" style="font-size: 12px; font-weight: 800; color: #2563eb;"></span>
         </div>
-        <div id="studentListContainer" class="divide-y divide-slate-100 max-h-[60vh] overflow-y-auto">
-          <!-- JS로 동적 생성 -->
-        </div>
+        <div id="studentListContainer" style="max-height: 60vh; overflow-y: auto;"></div>
       </div>
     </div>
   </div>
 
-  <!-- [4] 교사용 검수 팝업 모달 (학생 인터페이스와 동일 + 확인 완료 버튼) -->
-  <div id="verifyModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-      <div class="flex justify-between items-center mb-4">
+  <!-- [4] 교사용 검수 팝업 모달 -->
+  <div id="verifyModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <div>
-          <span class="text-xs font-bold text-indigo-600">제출 물품 현장 검수</span>
-          <h3 id="modalStudentTitle" class="text-lg font-black text-slate-900"></h3>
+          <span style="font-size: 11px; font-weight: 700; color: #4f46e5;">제출 물품 현장 검수</span>
+          <h3 id="modalStudentTitle" style="font-size: 17px; font-weight: 900;"></h3>
         </div>
-        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        <button onclick="closeModal()" style="border: none; background: none; font-size: 22px; cursor: pointer; color: #94a3b8;">&times;</button>
       </div>
 
-      <div class="grid grid-cols-2 gap-2.5 mb-6">
-        <button type="button" onclick="toggleModalItem('laptop')" id="mbtn-laptop" class="item-btn relative h-16 border rounded-xl flex flex-col items-center justify-center">
-          <span class="text-sm font-bold">노트북</span>
-          <span id="mbadge-laptop" class="hidden text-[10px] font-bold text-emerald-600">● 제출됨</span>
+      <div class="items-grid" style="margin-bottom: 16px;">
+        <button type="button" onclick="toggleModalItem('laptop')" id="mbtn-laptop" class="item-btn" style="height:65px;">
+          <span class="item-label" style="font-size:14px;">노트북</span>
+          <span id="mbadge-laptop" class="item-badge">● 제출됨</span>
         </button>
-        <button type="button" onclick="toggleModalItem('mouse')" id="mbtn-mouse" class="item-btn relative h-16 border rounded-xl flex flex-col items-center justify-center">
-          <span class="text-sm font-bold">마우스</span>
-          <span id="mbadge-mouse" class="hidden text-[10px] font-bold text-emerald-600">● 제출됨</span>
+        <button type="button" onclick="toggleModalItem('mouse')" id="mbtn-mouse" class="item-btn" style="height:65px;">
+          <span class="item-label" style="font-size:14px;">마우스</span>
+          <span id="mbadge-mouse" class="item-badge">● 제출됨</span>
         </button>
-        <button type="button" onclick="toggleModalItem('cable')" id="mbtn-cable" class="item-btn relative h-16 border rounded-xl flex flex-col items-center justify-center">
-          <span class="text-sm font-bold">전원 케이블</span>
-          <span id="mbadge-cable" class="hidden text-[10px] font-bold text-emerald-600">● 제출됨</span>
+        <button type="button" onclick="toggleModalItem('cable')" id="mbtn-cable" class="item-btn" style="height:65px;">
+          <span class="item-label" style="font-size:14px;">전원케이블</span>
+          <span id="mbadge-cable" class="item-badge">● 제출됨</span>
         </button>
-        <button type="button" onclick="toggleModalItem('adapter')" id="mbtn-adapter" class="item-btn relative h-16 border rounded-xl flex flex-col items-center justify-center">
-          <span class="text-sm font-bold">전원 어댑터</span>
-          <span id="mbadge-adapter" class="hidden text-[10px] font-bold text-emerald-600">● 제출됨</span>
+        <button type="button" onclick="toggleModalItem('adapter')" id="mbtn-adapter" class="item-btn" style="height:65px;">
+          <span class="item-label" style="font-size:14px;">전원어댑터</span>
+          <span id="mbadge-adapter" class="item-badge">● 제출됨</span>
         </button>
-        <button type="button" onclick="toggleModalItem('pouch')" id="mbtn-pouch" class="item-btn relative h-16 border rounded-xl flex flex-col items-center justify-center col-span-2">
-          <span class="text-sm font-bold">파우치</span>
-          <span id="mbadge-pouch" class="hidden text-[10px] font-bold text-emerald-600">● 제출됨</span>
+        <button type="button" onclick="toggleModalItem('pouch')" id="mbtn-pouch" class="item-btn" style="height:65px; grid-column: span 2;">
+          <span class="item-label" style="font-size:14px;">파우치</span>
+          <span id="mbadge-pouch" class="item-badge">● 제출됨</span>
         </button>
       </div>
 
-      <button onclick="confirmTeacherVerification()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3.5 rounded-xl text-base shadow transition">
-        확인 완료 (저장)
-      </button>
+      <button onclick="confirmTeacherVerification()" class="btn-action btn-blue" style="background:#4f46e5;">확인 완료 (저장)</button>
     </div>
   </div>
 
-  <!-- [5] A4 인쇄 전용 렌더링 영역 (PDF 양식 1:1 매칭) -->
+  <!-- [5] A4 인쇄 전용 영역 -->
   <div id="printArea" class="hidden">
-    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 12px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 10px;">
       <div>
         <span style="font-size: 13pt; font-weight: bold;">2026학년도</span>
-        <h1 id="printClassTitle" style="font-size: 22pt; font-weight: 900; margin: 0; line-height: 1.2;">3학년 1반</h1>
+        <h1 id="printClassTitle" style="font-size: 22pt; font-weight: 900; margin: 0;">3학년 1반</h1>
       </div>
-      <div style="font-size: 14pt; font-weight: bold; padding-bottom: 4px;">
-        담임: <span id="printTeacherName">이아름</span> (인)
+      <div style="font-size: 13pt; font-weight: bold;">
+        담임: <span id="printTeacherName"></span> (인)
       </div>
     </div>
 
@@ -237,9 +235,7 @@
           <th style="width: 12%;">비고</th>
         </tr>
       </thead>
-      <tbody id="printTableBody">
-        <!-- JS로 동적 행 삽입 -->
-      </tbody>
+      <tbody id="printTableBody"></tbody>
       <tfoot>
         <tr style="font-weight: bold; background-color: #f8fafc;">
           <td colspan="2">합계</td>
@@ -255,7 +251,23 @@
   </div>
 
   <script>
-    // 현재 세션 상태
+    // 통합 API 호출 함수 (내부 Google Script / 외부 URL 자동 호환)
+    function callBackend(actionName, params, callback) {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        // [내부 실행 모드]
+        google.script.run.withSuccessHandler(callback)[actionName](...params);
+      } else {
+        // [외부 실행 모드: URL 직접 호출]
+        fetch(GOOGLE_WEB_APP_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: actionName, payload: params })
+        })
+        .then(res => res.json())
+        .then(callback)
+        .catch(err => alert('서버 통신 오류가 발생했습니다: ' + err));
+      }
+    }
+
     let currentUser = null;
     let currentStudentItems = { laptop: false, mouse: false, cable: false, adapter: false, pouch: false, verified: false };
     let currentModalStudent = null;
@@ -265,79 +277,71 @@
       if (type === 'student') {
         document.getElementById('formStu').classList.remove('hidden');
         document.getElementById('formTea').classList.add('hidden');
-        document.getElementById('tabStu').className = 'flex-1 py-3 font-bold text-center border-b-2 border-blue-600 text-blue-600';
-        document.getElementById('tabTea').className = 'flex-1 py-3 font-semibold text-center text-slate-400 border-b-2 border-transparent';
+        document.getElementById('tabStu').classList.add('active');
+        document.getElementById('tabTea').classList.remove('active');
       } else {
         document.getElementById('formStu').classList.add('hidden');
         document.getElementById('formTea').classList.remove('hidden');
-        document.getElementById('tabTea').className = 'flex-1 py-3 font-bold text-center border-b-2 border-slate-900 text-slate-900';
-        document.getElementById('tabStu').className = 'flex-1 py-3 font-semibold text-center text-slate-400 border-b-2 border-transparent';
+        document.getElementById('tabTea').classList.add('active');
+        document.getElementById('tabStu').classList.remove('active');
       }
     }
 
-    // 학생 로그인 핸들러
     function handleStudentLogin() {
       const id = document.getElementById('stuIdInput').value.trim();
       const name = document.getElementById('stuNameInput').value.trim();
       if (!id || !name) return alert('학번과 이름을 모두 입력해주세요.');
 
-      google.script.run.withSuccessHandler(res => {
+      callBackend('studentLogin', [id, name], res => {
         if (!res.success) return alert(res.message);
         currentUser = res;
         currentStudentItems = res.status;
         showStudentView();
-      }).studentLogin(id, name);
+      });
     }
 
-    // 교사 로그인 핸들러
     function handleTeacherLogin() {
       const id = document.getElementById('teaIdInput').value.trim();
       const pw = document.getElementById('teaPwInput').value.trim();
       if (!id || !pw) return alert('아이디와 비밀번호를 입력해주세요.');
 
-      google.script.run.withSuccessHandler(res => {
+      callBackend('teacherLogin', [id, pw], res => {
         if (!res.success) return alert(res.message);
         currentUser = res;
         showTeacherView();
-      }).teacherLogin(id, pw);
+      });
     }
 
-    // 학생 화면 렌더링
     function showStudentView() {
       document.getElementById('loginView').classList.add('hidden');
       document.getElementById('studentView').classList.remove('hidden');
       document.getElementById('stuProfile').innerText = `${currentUser.id} ${currentUser.name}`;
-      
-      updateButtonsUI('btn-', 'badge-', currentStudentItems);
+      updateButtonsUI('btn-', currentStudentItems);
 
       if (currentStudentItems.verified) {
         document.getElementById('verifiedNotice').classList.remove('hidden');
+      } else {
+        document.getElementById('verifiedNotice').classList.add('hidden');
       }
     }
 
-    // 물품 토글 (학생)
     function toggleItem(key) {
       currentStudentItems[key] = !currentStudentItems[key];
-      updateButtonsUI('btn-', 'badge-', currentStudentItems);
+      updateButtonsUI('btn-', currentStudentItems);
     }
 
-    // 버튼 상태 UI 반영 (옅은 녹색 + 가운데 '제출됨' 라벨)
-    function updateButtonsUI(btnPrefix, badgePrefix, stateObj) {
+    function updateButtonsUI(prefix, stateObj) {
       const keys = ['laptop', 'mouse', 'cable', 'adapter', 'pouch'];
       keys.forEach(k => {
-        const btn = document.getElementById(btnPrefix + k);
-        const badge = document.getElementById(badgePrefix + k);
+        const btn = document.getElementById(prefix + k);
         if (stateObj[k]) {
-          btn.classList.add('active');
-          badge.classList.remove('hidden');
+          btn.classList.add('selected');
         } else {
-          btn.classList.remove('active');
-          badge.classList.add('hidden');
+          btn.classList.remove('selected');
         }
       });
     }
 
-    // 학생 제출 저장
     function saveStudentSubmission() {
       const payload = {
         id: currentUser.id,
@@ -354,14 +358,13 @@
       saveBtn.innerText = '저장 중...';
       saveBtn.disabled = true;
 
-      google.script.run.withSuccessHandler(res => {
+      callBackend('saveSubmission', [payload], res => {
         saveBtn.innerText = '제출 완료';
         saveBtn.disabled = false;
-        alert('성공적으로 제출 내용이 저장되었습니다!');
-      }).saveSubmission(payload);
+        alert('성공적으로 저장되었습니다!');
+      });
     }
 
-    // 교사 화면 렌더링
     function showTeacherView() {
       document.getElementById('loginView').classList.add('hidden');
       document.getElementById('teacherView').classList.remove('hidden');
@@ -370,28 +373,24 @@
       const selector = document.getElementById('classSelector');
       if (currentUser.assignedClass > 0) {
         selector.value = currentUser.assignedClass;
-        selector.disabled = true; // 담임교사는 자기 반 고정
+        selector.disabled = true;
       } else {
-        selector.disabled = false; // 부장교사는 모든 반 선택 가능
+        selector.disabled = false;
       }
       loadClassData();
     }
 
-    // 학급 데이터 로드
-    let currentClassStudents = [];
     function loadClassData() {
       const classNum = parseInt(document.getElementById('classSelector').value, 10);
       const container = document.getElementById('studentListContainer');
-      container.innerHTML = '<div class="p-6 text-center text-slate-400">데이터를 불러오는 중입니다...</div>';
+      container.innerHTML = '<div style="padding:20px; text-align:center; color:#94a3b8;">불러오는 중...</div>';
 
-      google.script.run.withSuccessHandler(data => {
-        currentClassStudents = data.students;
+      callBackend('getClassData', [classNum], data => {
         renderTeacherStudentList(data.students);
         preparePrintView(data);
-      }).getClassData(classNum);
+      });
     }
 
-    // 교사용 리스트 아이템 렌더링
     function renderTeacherStudentList(students) {
       const container = document.getElementById('studentListContainer');
       container.innerHTML = '';
@@ -400,7 +399,7 @@
       students.forEach(st => {
         if (st.verified) verifiedCount++;
         const div = document.createElement('div');
-        div.className = 'p-3.5 hover:bg-slate-50 flex items-center justify-between cursor-pointer transition';
+        div.className = 'student-item';
         div.onclick = () => openVerifyModal(st);
 
         const checkTags = [
@@ -413,16 +412,16 @@
 
         div.innerHTML = `
           <div>
-            <div class="flex items-center gap-2">
-              <span class="font-black text-slate-800">${st.num}번 ${st.name}</span>
-              <span class="text-xs text-slate-400">(${st.id})</span>
-              ${st.verified ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full">확인완료</span>' : ''}
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-weight:800; font-size:15px;">${st.num}번 ${st.name}</span>
+              <span style="font-size:12px; color:#94a3b8;">(${st.id})</span>
+              ${st.verified ? '<span class="tag-complete">확인완료</span>' : ''}
             </div>
-            <div class="text-xs text-slate-500 mt-1">
-              ${checkTags.length > 0 ? checkTags.join(', ') + ' 제출' : '<span class="text-red-400">미제출</span>'}
+            <div style="font-size:12px; color:#64748b; margin-top:2px;">
+              ${checkTags.length > 0 ? checkTags.join(', ') + ' 제출' : '<span style="color:#ef4444;">미제출</span>'}
             </div>
           </div>
-          <span class="text-indigo-600 font-bold text-xs bg-indigo-50 px-3 py-1.5 rounded-lg">검수하기 &rarr;</span>
+          <span style="color:#4f46e5; font-weight:700; font-size:12px;">검수하기 &rarr;</span>
         `;
         container.appendChild(div);
       });
@@ -430,7 +429,6 @@
       document.getElementById('classStats').innerText = `검수 완료: ${verifiedCount} / ${students.length}명`;
     }
 
-    // 검수 모달 열기
     function openVerifyModal(st) {
       currentModalStudent = st;
       modalItems = {
@@ -441,20 +439,19 @@
         pouch: st.pouch
       };
       document.getElementById('modalStudentTitle').innerText = `${st.classNum}반 ${st.num}번 ${st.name} (${st.id})`;
-      updateButtonsUI('mbtn-', 'mbadge-', modalItems);
+      updateButtonsUI('mbtn-', modalItems);
       document.getElementById('verifyModal').classList.remove('hidden');
     }
 
     function toggleModalItem(key) {
       modalItems[key] = !modalItems[key];
-      updateButtonsUI('mbtn-', 'mbadge-', modalItems);
+      updateButtonsUI('mbtn-', modalItems);
     }
 
     function closeModal() {
       document.getElementById('verifyModal').classList.add('hidden');
     }
 
-    // 교사 현장 확인 완료 저장
     function confirmTeacherVerification() {
       const payload = {
         id: currentModalStudent.id,
@@ -464,23 +461,21 @@
         cable: modalItems.cable,
         adapter: modalItems.adapter,
         pouch: modalItems.pouch,
-        verified: true // 교사 확인 승인
+        verified: true
       };
 
-      google.script.run.withSuccessHandler(res => {
+      callBackend('saveSubmission', [payload], res => {
         closeModal();
-        loadClassData(); // 리스트 새로고침
-      }).saveSubmission(payload);
+        loadClassData();
+      });
     }
 
-    // A4 인쇄 데이터 세팅 (첨부 PDF와 동일 레이아웃)
     function preparePrintView(data) {
       document.getElementById('printClassTitle').innerText = data.className;
       document.getElementById('printTeacherName').innerText = data.teacherName;
 
       const tbody = document.getElementById('printTableBody');
       tbody.innerHTML = '';
-
       let sums = { laptop: 0, mouse: 0, cable: 0, adapter: 0, pouch: 0 };
 
       data.students.forEach(st => {
@@ -493,7 +488,7 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${st.num}</td>
-          <td style="font-weight:600;">${st.name}</td>
+          <td style="font-weight:700;">${st.name}</td>
           <td>${st.laptop ? 'O' : ''}</td>
           <td>${st.mouse ? 'O' : ''}</td>
           <td>${st.cable ? 'O' : ''}</td>
@@ -520,7 +515,7 @@
     function logout() {
       currentUser = null;
       document.getElementById('studentView').classList.add('hidden');
-      document.getElementById('teacherView').classList.remove('hidden');
+      document.getElementById('teacherView').classList.add('hidden');
       document.getElementById('loginView').classList.remove('hidden');
     }
   </script>
